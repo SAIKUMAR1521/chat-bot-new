@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: linear-gradient(to right, #232526, #414345);
+      color: #fff;
+    }
+
+    #chat {
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      max-width: 600px;
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(6px);
+      animation: floatBox 6s ease-in-out infinite;
+    }
+
+    .message {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      animation: fadeIn 0.5s ease forwards;
+      transform: translateY(10px);
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes floatBox {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    #chat > div:first-child {
+      color: #ccc;
+      font-style: italic;
+      animation: fadeIn 1s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <h2>📺 Viewer Page (Read-Only)</h2>
+  <div id="chat">
+    <div style="color: gray;">Waiting for messages...</div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host);
+
+    ws.onopen = () => {
+      console.log("✅ Connected to WebSocket (viewer)");
+      chat.innerHTML += `<div style="color: green;">✅ Connected to server</div>`;
+    };
+
+    ws.onmessage = (event) => {
+      console.log("📥 Received in viewer:", event.data);
+      const msgDiv = document.createElement("div");
+      msgDiv.className = "message";
+      msgDiv.innerHTML = `<b>Sender:</b> ${event.data}`;
+      chat.appendChild(msgDiv);
+    };
+
+    ws.onerror = (err) => {
+      console.error("❌ WebSocket error:", err);
+      chat.innerHTML += `<div style="color: red;">WebSocket error: ${err.message}</div>`;
+    };
+
+    ws.onclose = () => {
+      console.warn("⚠️ WebSocket closed");
+      chat.innerHTML += `<div style="color: orange;">Connection closed</div>`;
+    };
+  </script>
+</body>
+</html>
