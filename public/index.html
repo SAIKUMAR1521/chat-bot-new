@@ -102,8 +102,8 @@
   </div>
 
   <script>
-    const ws = new WebSocket("ws://" + location.host);
-    const form = document.getElementById("form");
+const protocol = location.protocol === "https:" ? "wss" : "ws";
+const ws = new WebSocket(`${protocol}://${location.host}`);    const form = document.getElementById("form");
     const input = document.getElementById("msg");
     const chat = document.getElementById("chat");
 
